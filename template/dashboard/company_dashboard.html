@@ -1,5 +1,6 @@
 {% extends "header.html" %}
 {% block title %} Company Dashboard {% endblock %}
+{% block recuritactive %} active {% endblock %}
 
 {% block style %}
 <style>
@@ -138,11 +139,12 @@
         </div>
         {% else %}
         <p>No active job listings. <a href="{% url 'adminsignup' %}">Post a new job</a></p>
-        <p><a href="{% url 'postjob' %}">Already Logged as an Admin? Continue with Job Posting</a></p>
+        
 
         {% endif %}
-
-        <!-- Analytics Overview Section -->
+           
+        <p>
+            <p><a href="{% url 'postjob' %}">Already Logged as an Admin? Continue with Job Posting</a></p>
         <div class="analytics-overview">
             <!-- Views Card -->
             <div class="analytics-card">

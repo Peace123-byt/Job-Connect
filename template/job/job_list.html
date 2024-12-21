@@ -9,13 +9,16 @@
         <div class="row">
             <div class="col-md-12">
                 <h1 class="d-flex justify-content-center">Job Listings</h1>
-                <form method="get">
+                <form method="get" action="{% url 'joblistpost' %}">
                     <div class="input-group mb-3">
                         <input type="text" class="form-control" placeholder="Search for jobs"
                             value="{% if query %}{{query}}{% endif %}" aria-label="Search for jobs"
                             aria-describedby="basic-addon2" name="query">  
-
-                        <button class="btn btn-outline-secondary" type="submit" id="button-addon2">Search</button>
+                        
+                            
+                                <button type="submit">Search</button>
+                            </form>
+                       
                     </div>
                 </form>
             </div>

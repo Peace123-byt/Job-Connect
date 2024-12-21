@@ -223,13 +223,31 @@ def admin_signup(request):
 
 def job_list_post(request):
     global jobs
-    length = 10
-    pages = Paginator(jobs, length)
+    length = 10  # Number of items per page
+    query = request.GET.get("query")  # Get the search query from the request
+
+    # Filter jobs based on the search query (case insensitive)
+    if query:
+        filtered_jobs = [job for job in jobs if query.lower() in job['title'].lower()]
+    else:
+        filtered_jobs = jobs  # If no query, return all jobs
+
+    # Set up pagination
+    pages = Paginator(filtered_jobs, length)
     page_number = request.GET.get("page", 1)
     page_obj = pages.get_page(page_number)
-    context = {'jobs': jobs[(int(page_number)*length)-length: (int(page_number)*length)], 'page_obj': page_obj, "leav": "this is it"}
-    if query := request.GET.get("query"):
+
+    # Context to be passed to the template
+    context = {
+        'jobs': filtered_jobs[(int(page_number) * length) - length: (int(page_number) * length)], 
+        'page_obj': page_obj,
+        "leav": "this is it",  # Optional additional context (remove or modify as needed)
+    }
+
+    # Add query to context if present
+    if query:
         context['query'] = query
+
     return render(request, "job/job_list.html", context)
 
 def job_single(request, primary_key):
@@ -271,14 +289,10 @@ def student_dashboard(request):
         
         name=user.full_name
     except Exception as e:
-        del request.session['access_token']  # Clear the session
-        return redirect('student_login') 
+        
+        return redirect('studentlogin') 
     active_jobs=ApplicationForm.objects.all().filter(user__public_id=str(user_id).replace("-",""))
-# full_name=models.TextField(null=True,blank=True)
-#     email=models.EmailField(null=True,blank=True)
-#     phone_number=models.CharField(max_length=15,null=True,blank=True)
-#     cover_letter=models.TextField(null=True,blank=True)
-#     resume=models.FileField(upload_to='photos',null=True,blank=True)
+
     list_of_jobs=[]
     for job_applied in active_jobs:
         job_data={"full_name":job_applied.full_name,"email":job_applied.email,"phone_number":job_applied.phone_number,"cover_letter":job_applied.cover_letter,}
