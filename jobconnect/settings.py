@@ -178,20 +178,20 @@ STATICFILES_DIRS = [os.path.join(BASE_DIR, 'static')]
 
 MEDIA_URL='media/'
 MEDIA_ROOT=os.path.join(BASE_DIR,'media')
-CLOUD_NAME="drlcmhrcg"
-CLOUDINARY_API_KEY="997498217494732"
-CLOUDINARY_API_SECRET="kNxzzNDDqvi2ppSHIpbWIU58_wA"
-CLOUDINARY_STORAGE = {
-    'CLOUD_NAME': CLOUD_NAME,
-    'API_KEY': CLOUDINARY_API_KEY,
-    'API_SECRET': CLOUDINARY_API_SECRET,
-}
+# CLOUD_NAME="drlcmhrcg"
+# CLOUDINARY_API_KEY="997498217494732"
+# CLOUDINARY_API_SECRET="kNxzzNDDqvi2ppSHIpbWIU58_wA"
+# CLOUDINARY_STORAGE = {
+#     'CLOUD_NAME': CLOUD_NAME,
+#     'API_KEY': CLOUDINARY_API_KEY,
+#     'API_SECRET': CLOUDINARY_API_SECRET,
+# }
 
-EMAIL_HOST='mail.finderskeepers.ai',
-EMAIL_PORT=465,
-EMAIL_HOST_USER='support@finderskeepers.ai',
-EMAIL_HOST_PASSWORD='L4h6b##+g%db',
-EMAIL_USE_SSL=True,  # or EMAIL_USE_TLS = True
+# EMAIL_HOST='mail.finderskeepers.ai',
+# EMAIL_PORT=465,
+# EMAIL_HOST_USER='support@finderskeepers.ai',
+# EMAIL_HOST_PASSWORD='L4h6b##+g%db',
+# EMAIL_USE_SSL=True,  # or EMAIL_USE_TLS = True
 
 DEFAULT_FILE_STORAGE = 'cloudinary_storage.storage.MediaCloudinaryStorage'
 # Default primary key field type
@@ -219,6 +219,6 @@ LOGGING = {
     },
 }
 
-USE_X_FORWARDED_HOST = True
-USE_X_FORWARDED_PORT = True
-SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
+# USE_X_FORWARDED_HOST = True
+# USE_X_FORWARDED_PORT = True
+# SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
