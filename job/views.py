@@ -134,19 +134,37 @@ def contact_us(request):
 
 def student_login(request):
     if request.method=='POST':
-   
-        login_data={"email":request.POST['email'],"password":request.POST['password']}
-        response=requests.post(f"{api_url.base_url}/login/",json=login_data)
+        email=request.POST['email']
+        login_data={"email":email,"password":request.POST['password']}
 
-        if response.json()['status']==True:
-            response_data=response.json()
-            request.session['access_token'] = response_data['data']['access']
-            request.session['user_id'] = response_data['data']['user']['id']
-            return redirect('joblistpost')
+        current_user=User.objects.get(email=str(request.POST['email']))
+
+        
+        if current_user.is_superuser:
+            return redirect('adminlogin')
         else:
-            return redirect('studentsignup')
-    return render(request, "auth/student_login.html")
+            response=requests.post(f"{api_url.base_url}/login/",json=login_data)
 
+            if response.json()['status']==True:
+
+                response_data=response.json()
+                request.session['access_token'] = response_data['data']['access']
+                request.session['user_id'] = response_data['data']['user']['id']
+                request.session['email'] = response_data['data']['user']['email']
+
+                current_user.is_logged_in=True
+                current_user.save()
+                return redirect('joblistpost')
+            else:
+                return redirect('studentsignup')
+    
+    return render(request, "auth/student_login.html")
+def logout(request):
+    
+    current_user=User.objects.get(email=str(request.session.get("email")))
+    current_user.is_logged_in=False
+    current_user.save()
+    return redirect('studentlogin')
 def student_signup(request):
     if request.method=='POST':
     #      "id": "8fd354acae80425db147021537b75a01",
@@ -159,29 +177,44 @@ def student_signup(request):
         signup_data={"email":request.POST['email'],"full_name":request.POST['full_name'],"student_id":request.POST['student_id'],"gender":request.POST['gender'],"password":request.POST['password'],"confirm_password":request.POST['confirm_password'],"phone_number":request.POST['phone_number'],}
         response=requests.post(f"{api_url.base_url}/register/",json=signup_data)
         # print(response.status_code)
-        # print(signup_data.)
-        if response.json()['status']==True:
-            return redirect('studentlogin')
+        print(signup_data.json())
+        # if response.json()['status']==True:
+        #     return redirect('studentlogin')
 
-        else:
-            return redirect('studentsignup')
+        # else:
+        #     return redirect('studentsignup')
 
     return render(request, "auth/student_signup.html")
 
 def admin_login(request):
     if request.method=='POST':
-   
-        login_data={"email":request.POST['email'],"password":request.POST['password']}
+        email=request.POST['email']
+        login_data={"email":email,"password":request.POST['password']}
+        current_user=User.objects.get(email=str(request.POST['email']))
         response=requests.post(f"{api_url.base_url}/login/",json=login_data)
+
+        # if not current_user.is_logged_in:
+        #     return redirect('adminlogin')
 
         if response.json()['status']==True:
             response_data=response.json()
+            print(response_data)
             request.session['access_token'] = response_data['data']['access']
             request.session['user_id'] = response_data['data']['user']['id']
             request.session['full_name']=response_data['data']['user']['full_name']
+            request.session['email'] = response_data['data']['user']['email']
+
+            try:
+                company=CompanyProfile.objects.get(user__public_id=str(response_data['data']['user']['id']))
+                request.session['company_name']=company.company_name
+                
+            except CompanyProfile.DoesNotExist as e:
+                return redirect('studentlogin')
+            current_user=User.objects.get(email=str(request.POST['email']))
             
-            company=CompanyProfile.objects.get(user__public_id=str(response_data['data']['user']['id']))
-            request.session['company_name']=company.company_name
+
+            current_user.is_logged_in=True
+            current_user.save()  
             return redirect('companydashboard')
         else:
             return redirect('adminsignup')
@@ -190,23 +223,7 @@ def admin_login(request):
 def admin_signup(request):
     try:
         if request.method=='POST':
-        #      "id": "8fd354acae80425db147021537b75a01",
-        # "email": "user@example.com",
-        # "gender": "Male",
-        # "full_name": "Eze Kc",
-        # "password": "pbkdf2_sha256$600000$OkFHzcR0NhzqANQBePh4pb$RI4TgTN3LnWbOyA3kUEHpLXbnYveEPc9htIV6zuuCbk=",
-        # "phone_number": "0808219999",
-        # "student_id": "2019/24355555"
-    #     {
-    #   "email": "user@example.com",
-    #   "full_name": "Ephraim",
-    #   "password": "Jude1999",
-    #   "confirm_password": "Jude1999",
-    #   "company_phone_number": "+1999999999999",
-    #   "company_name": "Google",
-    #   "company_address": "Usa",
-    #   "company_url": "https://google.com"
-    # }
+    
             signup_data={"email":request.POST['email'],"full_name":request.POST['full_name'],"password":request.POST['password'],'confirm_password':request.POST['confirm_password'],'company_phone_number':request.POST['company_phone_number'],'company_name':request.POST['company_name'],'company_address':request.POST['company_address'],'company_url':request.POST['company_url']}
             response=requests.post(f"{api_url.base_url}/admin-board/register/",json=signup_data)
 
@@ -223,12 +240,12 @@ def admin_signup(request):
 
 def job_list_post(request):
     global jobs
-    length = 10  # Number of items per page
+    length = 5  # Number of items per page
     query = request.GET.get("query")  # Get the search query from the request
-
+    # print(query)
     # Filter jobs based on the search query (case insensitive)
     if query:
-        filtered_jobs = [job for job in jobs if query.lower() in job['title'].lower()]
+        filtered_jobs = [job for job in jobs if query.lower() in job['title'].lower() or query.lower() in job['company_name'].lower() ]
     else:
         filtered_jobs = jobs  # If no query, return all jobs
 
@@ -254,6 +271,15 @@ def job_single(request, primary_key):
     if not (single := [i for i in jobs if i['pk'] == primary_key]):
         return redirect('index')
     single = single[0]
+    company_name=single['company_name']
+    try:
+        total_views=int(request.session.get('company_number_of_clicks'))
+    except Exception as e:
+        
+        total_views=0
+    total_views+=1
+    request.session['company_number_of_clicks']=total_views
+    monitor_click={f'{company_name}':total_views}
     return render(request, 'dashboard/student/detailed_saved_job.html', context={'job':single})
 
 def reset_password(request):
@@ -288,6 +314,9 @@ def student_dashboard(request):
         user=User.objects.get(public_id=str(user_id).replace("-",""))
         
         name=user.full_name
+
+        if user.is_superuser:
+            return redirect('adminlogin')
     except Exception as e:
         
         return redirect('studentlogin') 
@@ -298,6 +327,10 @@ def student_dashboard(request):
         job_data={"full_name":job_applied.full_name,"email":job_applied.email,"phone_number":job_applied.phone_number,"cover_letter":job_applied.cover_letter,}
         list_of_jobs.append(job_data)
     print(list_of_jobs)
+    current_user=User.objects.get(email=user.email)
+    
+    if not current_user.is_logged_in:
+        return redirect('studentlogin')
     context= {
         "name":name,
         
@@ -354,15 +387,24 @@ def detailed_saved_job(request, job_id):
 """
 
 def apply_job(request, job_id):
+    if not (single := [i for i in jobs if i['pk'] == job_id]):
+        return redirect('index')
+    single = single[0]
+
+    company_name=single['company_name']
+    location=single['place']
+    context={"company_name":company_name,"location":location}
+    # context={"company_name":"ui","location":"london"}
     if request.method == 'POST':
         if 'title' in request.POST:
             job_title=f"{request.POST['title']}"
             request.session['job_title']=job_title
+
             # print(job_title)
         else:
             print("POST request made but no 'title' found in the request data.")
         # return redirect('index')  
-    return render(request, "job/applied_job.html")
+    return render(request, "job/applied_job.html",context)
 
 
 def successful_submission(request, job_id):
@@ -444,29 +486,27 @@ def download_cv(request, filename):
     file_path = os.path.join(settings.MEDIA_ROOT, filename)
     if os.path.exists(file_path):
         # Serve the file as a response
-        return FileResponse(open(file_path, 'rb'), content_type='application/pdf')
+        # return FileResponse(open(file_path, 'rb'), content_type='application/pdf')
+        # http://localhost:8000/media/jobfiles/Christian-Kelechi-Eze-FlowCV-Resume-20241008_3.pdf
+        return render(file_path+f"{filename}",request)
     else:
         # Handle file not found
         return HttpResponse("File not found.", status=404)
 def company_dashboard(request):
+    try:
+        total_views=int(request.session.get('total_views'))
+    except Exception as e:
+        
+        total_views=0
 
     try:
         company_name=request.session.get("company_name")
         user=CompanyProfile.objects.get(user__public_id=str(request.session.get('user_id')))
-    except Exception as e:
-        return redirect('adminlogin')
+    except CompanyProfile.DoesNotExist as e:
+        return redirect('studentlogin')
     list_of_jobs=Job.objects.all().filter(company_name=company_name)
     jobs=[]
-    # title=models.CharField(null=True,blank=True,max_length=1000)
-    #     company_name=models.CharField(null=True,blank=True,max_length=1000)
-    #     monthly_salary=models.CharField(null=True,blank=True,max_length=100)
-    #     description=models.TextField(null=True,blank=True)
-    #     location=models.TextField(null=True,blank=True)
-    #     no_of_opening=models.IntegerField(null=True,blank=True)
-    #     application_starting_date = models.DateTimeField(null=True, blank=True)
-    #     application_ending_date = models.DateTimeField(null=True, blank=True)
     for  job in list_of_jobs:
-
         jobs.append(
             {
                 "pk": str(job.pk),
@@ -482,12 +522,19 @@ def company_dashboard(request):
                 "job_requirements":job.job_requirements
             }
         )
-
     total_jobs=Job.objects.filter(company_name=company_name).count()
     # current_jobs=jobs.filte
     total_applicants_count=ApplicationForm.objects.filter(job__company_name=company_name).count()
+    total_views+=1
+    request.session['total_views']=total_views
+    current_total_view=request.session.get('total_views')
     
-    return render(request, "dashboard/company_dashboard.html", {'jobs':jobs,'total_applicants_count':total_applicants_count,'total_jobs':total_jobs,"full_name":request.session.get("full_name"),"company_name":company_name})
+    current_total_clicks=request.session.get('company_number_of_clicks')
+    current_user=User.objects.get(email=user.user.email)
+    
+    if not current_user.is_logged_in:
+        return redirect('studentlogin')
+    return render(request, "dashboard/company_dashboard.html", {'jobs':jobs,'total_applicants_count':total_applicants_count,'total_jobs':total_jobs,"full_name":request.session.get("full_name"),"company_name":company_name,"total_clicks":current_total_clicks})
 
 def post_job(request, job_id=None):
 
@@ -582,11 +629,6 @@ def job_applications(request, job_id=None):
     except Exception as e:
         return redirect("adminlogin")
     applicants=ApplicationForm.objects.all().filter(job__company_name=company_name)
-    # if not (single := [i for i in jobs if i['pk'] == job_id]):
-    #     return redirect('index')
-    # job = single[0]
-    # context = {
-    #     'job': job,
-    # }
+ 
 
     return render(request, 'dashboard/company/job_applications.html', {"applicants":applicants})

@@ -29,7 +29,7 @@ class ApplicationForm(models.Model):
     email=models.EmailField(null=True,blank=True)
     phone_number=models.CharField(max_length=15,null=True,blank=True)
     cover_letter=models.TextField(null=True,blank=True)
-    resume=models.FileField(upload_to='photos',null=True,blank=True)
+    resume=models.FileField(upload_to='jobfiles',null=True,blank=True)
     job=models.ForeignKey(Job,on_delete=models.CASCADE,null=True,blank=True)
     application_date=models.DateField(auto_now_add=True,null=True,blank=True)
     job_status=models.TextField(null=True,blank=True,default="under_review")

@@ -18,6 +18,7 @@ urlpatterns = [
     path('student-login', job.student_login, name="studentlogin"),
     path("apply-job/<str:job_id>", job.apply_job, name="apply-job"),
     path('student-signup', job.student_signup, name="studentsignup"),
+    path('logout', job.logout, name="logout"),
     path("reset-password", job.reset_password, name="resetpassword"),
     path("change-password", job.change_password, name="changepassword"),
     path("student-profile", job.student_profile, name="studentprofile"),

@@ -3,7 +3,7 @@ from rest_framework import viewsets
 
 from core_root_api.security.user.serializers.user import UserSerializer
 from core_root_api.security.user.models import User
-
+from rest_framework.response import Response
 class UserViewset(viewsets.ModelViewSet):
     http_method_names=['patch','get']
     permission_classes=[AllowAny,]
@@ -13,6 +13,8 @@ class UserViewset(viewsets.ModelViewSet):
         if self.request.user.is_superuser:
             return User.objects.all()
         return User.objects.exclude(is_superuser=True)
+        
+
     
     def get_object(self):
         obj=User.objects.get_object_by_public_id(self.kwargs['pk'])

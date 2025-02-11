@@ -101,22 +101,16 @@
                 <h4>Active Jobs</h4>
                 <p>{{ total_jobs }}</p>
             </div>
-
-            <!-- Recent Applications Card -->
             <div class="summary-card">
                 <h4>Recent Applications</h4>
                 <p>{{ recent_applications_count }}</p>
                 <a href="{% url 'jobapplications' %}" class="btn btn-primary">View Application</a>
             </div>
-
-            <!-- Total Applicants Card -->
             <div class="summary-card">
                 <h4>Total Applicants</h4>
                 <p>{{ total_applicants_count }}</p>
             </div>
         </div>
-
-        <!-- Job Listings Section -->
         <h3>Active Job Listings</h3>
         {% if jobs %}
         <div class="row">
@@ -129,20 +123,16 @@
                         <p><strong>Location:</strong> {{ job.place }}</p>
                         <p><strong>Company:</strong> {{ job.company_name }}</p>
                         <p><strong>Posted on:</strong> {{ job.application_starting_date }}</p>
-                        <a href="{% url 'singlejob' job.pk %}" class="btn btn-primary">View Job</a>
+                        <!-- <a href="{% url 'singlejob' job.pk %}" class="btn btn-primary">View Job</a> -->
                     </div>
                 </div>
             </div>
             {% endfor %}
             <p><a href="{% url 'adminsignup' %}">Login to Post a new Job</a></p>
-
         </div>
         {% else %}
         <p>No active job listings. <a href="{% url 'adminsignup' %}">Post a new job</a></p>
-        
-
         {% endif %}
-           
         <p>
             <p><a href="{% url 'postjob' %}">Already Logged as an Admin? Continue with Job Posting</a></p>
         <div class="analytics-overview">

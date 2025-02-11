@@ -64,6 +64,8 @@ MIDDLEWARE = [
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     'whitenoise.middleware.WhiteNoiseMiddleware',
+    # 'core_root_api.middleware.LoggingMiddleware',
+    # 'core_root_api.middleware.ApiKeyMiddleware',
 
 ]
 
@@ -185,6 +187,12 @@ CLOUDINARY_STORAGE = {
     'API_SECRET': CLOUDINARY_API_SECRET,
 }
 
+EMAIL_HOST='mail.finderskeepers.ai',
+EMAIL_PORT=465,
+EMAIL_HOST_USER='support@finderskeepers.ai',
+EMAIL_HOST_PASSWORD='L4h6b##+g%db',
+EMAIL_USE_SSL=True,  # or EMAIL_USE_TLS = True
+
 DEFAULT_FILE_STORAGE = 'cloudinary_storage.storage.MediaCloudinaryStorage'
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.1/ref/settings/#default-auto-field
@@ -194,3 +202,23 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 
 
+LOGGING = {
+    'version': 1,
+    'handlers': {
+        'file': {
+            'level': 'INFO',
+            'class': 'logging.FileHandler',
+            'filename': 'django.log',
+        },
+    },
+    'loggers': {
+        'core_root_api': {
+            'handlers': ['file'],
+            'level': 'INFO',
+        },
+    },
+}
+
+USE_X_FORWARDED_HOST = True
+USE_X_FORWARDED_PORT = True
+SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')

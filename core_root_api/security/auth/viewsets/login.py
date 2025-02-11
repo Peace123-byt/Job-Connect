@@ -37,7 +37,7 @@ class LoginViewSet(viewsets.ModelViewSet):
 
         except:
             
-            return Response({'error_msg':'User  with that email or password does not exist','status':False},status=status.HTTP_401_UNAUTHORIZED)    
+            return Response({'error_msg':'Internal server error','status':False},status=status.HTTP_401_UNAUTHORIZED)    
 
         # return Response({"error_message":"Could not login, due to invalid credentials",'status':False}, status=status.HTTP_400_BAD_REQUEST)
 from rest_framework.response import Response
@@ -65,9 +65,6 @@ class LoginViewSet(viewsets.ModelViewSet):
     def create(self, request, *args, **kwargs):
         try:
             serializer = self.serializer_class(data=request.data)
-            # print(serializer)
-            
-            
             if serializer.is_valid():
                 valid_user=User.objects.get(email=str(serializer.initial_data['email']))
                 if valid_user.is_active==False:
