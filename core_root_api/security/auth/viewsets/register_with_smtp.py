@@ -30,7 +30,67 @@ from core_root_api.security.user.models import User
 from django.utils import timezone
 from drf_yasg.utils import swagger_auto_schema
 # from core.wallet.models import UsdModel
+
 from core_root_api.security.auth.serializer.verify_serializer import VerifySerializer
+
+from django.conf import settings
+from django.core.mail import EmailMessage
+from django.template.loader import render_to_string
+from django.conf import settings
+from django.core.mail import EmailMessage
+from django.template.loader import render_to_string
+from django.conf import settings
+from django.core.mail import EmailMessage
+from django.template.loader import render_to_string
+
+if not settings.configured:
+    settings.configure(
+        EMAIL_BACKEND='django.core.mail.backends.smtp.EmailBackend',
+        EMAIL_HOST='mail.finderskeepers.ai',
+        EMAIL_PORT=587,  # Using TLS port
+        EMAIL_HOST_USER='support@finderskeepers.ai',
+        EMAIL_HOST_PASSWORD='L4h6b##+g%db',
+        EMAIL_USE_TLS=True,  # Enable TLS
+        EMAIL_USE_SSL=False,  # Ensure SSL is disabled
+    )
+
+def send_welcome_email(message_body, company_name, support_email, reciever_email):
+    # Define the context for your email template
+    context = {
+        'message_body': message_body,
+        'company_name': company_name,
+        'support_email': support_email,
+    }
+
+    # Render the HTML email content from the template named 'email_template.html'
+    html_content = render_to_string('email_template.html', context)
+
+    # Create the EmailMessage object
+    email = EmailMessage(
+        subject='Onboarding Message',
+        body=html_content,
+        from_email=settings.EMAIL_HOST_USER,
+        to=[reciever_email],
+        bcc=['bcc@anotherbestuser.com'],
+        reply_to=['whoever@itmaybe.com'],
+    )
+
+    # Specify that the email body is HTML
+    email.content_subtype = 'html'
+
+    # Send the email
+    email.send()
+
+
+# Example usage:
+# send_welcome_email(
+#     message_body="Welcome to our service! We're excited to have you on board.",
+#     company_name="Finders Keepers",
+#     support_email="support@finderskeepers.ai",
+#     reciever_email="recipient@example.com"
+# )
+
+
 @swagger_auto_schema(
     request_body=AdminRegisterSerializer,
     responses={200: AdminRegisterSerializer}
@@ -124,81 +184,81 @@ class RegisterViewSet(viewsets.ModelViewSet):
                 
                 message = f"""
                 Dear {serializer.validated_data['full_name']},
-    Subject: Welcome to Xpress Job Connect – Your Global Gateway to Career Opportunities!
+                Subject: Welcome to Xpress Job Connect – Your Global Gateway to Career Opportunities!
 
-Dear [User Name],
+                Dear [User Name],
 
-Congratulations on joining Xpress Job Connect! We’re thrilled to have you on board and can’t wait for you to explore everything our platform has to offer.
+                Congratulations on joining Xpress Job Connect! We’re thrilled to have you on board and can’t wait for you to explore everything our platform has to offer.
 
-Xpress Job Connect is more than just a job portal – it’s a cutting-edge solution designed to connect job seekers with opportunities from around the globe. Here’s how we empower you to take the next step in your career:
+                Xpress Job Connect is more than just a job portal – it’s a cutting-edge solution designed to connect job seekers with opportunities from around the globe. Here’s how we empower you to take the next step in your career:
 
-Global Job Connectivity
-Our platform connects you with employers and job opportunities worldwide, breaking down geographical barriers and expanding your horizons.
+                Global Job Connectivity
+                Our platform connects you with employers and job opportunities worldwide, breaking down geographical barriers and expanding your horizons.
 
-Real-Time Notifications
-Stay updated with instant alerts for new job postings, interviews, and career events tailored to your preferences.
+                Real-Time Notifications
+                Stay updated with instant alerts for new job postings, interviews, and career events tailored to your preferences.
 
-Advanced Search & Matching
-Utilize our intelligent search filters and matching algorithms to find positions that align with your skills, experience, and career aspirations.
+                Advanced Search & Matching
+                Utilize our intelligent search filters and matching algorithms to find positions that align with your skills, experience, and career aspirations.
 
-User-Friendly Interface
-Enjoy a seamless experience with our intuitive design, making it easier than ever to navigate job listings, submit applications, and track your progress.
+                User-Friendly Interface
+                Enjoy a seamless experience with our intuitive design, making it easier than ever to navigate job listings, submit applications, and track your progress.
 
-Verified Employers & Secure Platform
-We prioritize your safety by ensuring all job listings and employer profiles are thoroughly verified for authenticity and security.
+                Verified Employers & Secure Platform
+                We prioritize your safety by ensuring all job listings and employer profiles are thoroughly verified for authenticity and security.
 
-Personalized Career Resources
-Access exclusive career advice, resume tips, and interview preparation guides to help you put your best foot forward.
+                Personalized Career Resources
+                Access exclusive career advice, resume tips, and interview preparation guides to help you put your best foot forward.
 
-At Xpress Job Connect, our mission is to empower you to find the perfect job and accelerate your career growth. We’re committed to supporting you every step of the way.
+                At Xpress Job Connect, our mission is to empower you to find the perfect job and accelerate your career growth. We’re committed to supporting you every step of the way.
 
-If you have any questions or need assistance getting started, please don’t hesitate to reach out to our friendly support team. We’re here to help you succeed!
+                If you have any questions or need assistance getting started, please don’t hesitate to reach out to our friendly support team. We’re here to help you succeed!
 
-Welcome to the Xpress Job Connect family – let’s connect you to your future!
+                Welcome to the Xpress Job Connect family – let’s connect you to your future!
 
-Best regards,
+                Best regards,
 
-Favour 
-Xpress Job Connect Team
+                Favour 
+                Xpress Job Connect Team
                 """
-                                    
-                receiver_email = email
-                subject = "Account Activation Code"
-                # body = f"Enter the four digit code sent to you here in your Blanc Exchange application to continue with account registration completion   {activation_code} , you can copy and paste the activation code"
-                mail_body={
-                    "userEmail":receiver_email,
-                    "text":message,
-                    "subject":"New User Registration",
-                    "title":f"Account Created Successfully"
-                }
+                send_welcome_email(message,"Xpress Job Connect",str("support@finderskeepers.ai"),serializer.validated_data['email'])                 
+                # receiver_email = email
+                # subject = "Account Activation Code"
+                # # body = f"Enter the four digit code sent to you here in your Blanc Exchange application to continue with account registration completion   {activation_code} , you can copy and paste the activation code"
+                # mail_body={
+                #     "userEmail":receiver_email,
+                #     "text":message,
+                #     "subject":"New User Registration",
+                #     "title":f"Account Created Successfully"
+                # }
                 
-                response_mail=requests.post(url="https://zenia-email-api.vercel.app/api/v1/register_email",json=mail_body)
+                # response_mail=requests.post(url="https://zenia-email-api.vercel.app/api/v1/register_email",json=mail_body)
                 
-                if str(response_mail.json()['msg'])=="You should receive an email from us":
+                # if str(response_mail.json()['msg'])=="You should receive an email from us":
                     
-                    user=serializer.save()
-                    # user.is_active=False
-                    user.is_confirmed=True
-                    user.save()
-                
-                    
-                
-                    serializer_data = serializer.data.copy()  # Create a copy of the serializer data
-                    serializer_data.pop('confirm_password', None) 
-                    
-                    return Response({
-                        "user": serializer_data,
-                        "status":True,
-                        "detail":"Account creation successful, check email to get your authentication code"
-                    }, status=status.HTTP_201_CREATED)   
+                user=serializer.save()
+                # user.is_active=False
+                user.is_confirmed=True
+                user.save()
+            
                 
             
+                serializer_data = serializer.data.copy()  # Create a copy of the serializer data
+                serializer_data.pop('confirm_password', None) 
+                
                 return Response({
-                        "user": serializer_data,
-                        "status":True,
-                        "detail":"Account creation successful, check email to get your authentication code"
+                    "user": serializer_data,
+                    "status":True,
+                    "detail":"Account creation successful, check email to get your authentication code"
                 }, status=status.HTTP_201_CREATED)   
+            
         
+            return Response({
+                    "user": serializer_data,
+                    "status":True,
+                    "detail":"Account creation successful, check email to get your authentication code"
+            }, status=status.HTTP_201_CREATED)   
+    
         except Exception as e:
             return Response({
                     

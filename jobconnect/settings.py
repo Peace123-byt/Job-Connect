@@ -10,7 +10,6 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/5.1/ref/settings/
 """
 from datetime import timedelta
-
 from pathlib import Path
 import os
 from dotenv import load_dotenv
@@ -187,11 +186,12 @@ MEDIA_ROOT=os.path.join(BASE_DIR,'media')
 #     'API_SECRET': CLOUDINARY_API_SECRET,
 # }
 
-# EMAIL_HOST='mail.finderskeepers.ai',
-# EMAIL_PORT=465,
-# EMAIL_HOST_USER='support@finderskeepers.ai',
-# EMAIL_HOST_PASSWORD='L4h6b##+g%db',
-# EMAIL_USE_SSL=True,  # or EMAIL_USE_TLS = True
+
+# Configure email settings (ensure this is done before sending emails)
+# Alternatively, use EMAIL_USE_TLS if required
+
+
+ # or EMAIL_USE_TLS = True
 
 DEFAULT_FILE_STORAGE = 'cloudinary_storage.storage.MediaCloudinaryStorage'
 # Default primary key field type
