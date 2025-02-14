@@ -25,8 +25,8 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = 'django-insecure-n5lf4)z(96uga55e2cfqb(x@bcsom&-74=64y=&%q=ua-v)8hb'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = False
-# DEBUG=False
+# DEBUG = False
+DEBUG=True
 ALLOWED_HOSTS = ['https://job-connect-5574.onrender.com','*']
 
 
@@ -164,28 +164,38 @@ USE_TZ = True
 
 STATIC_URL = 'static/'
 
-# STATICFILES_DIRS = [
-#     os.path.join(BASE_DIR, 'static'),
-# ]
+STATICFILES_DIRS = [
+    os.path.join(BASE_DIR, 'static'),
+]
 SIMPLE_JWT = {
     'ACCESS_TOKEN_LIFETIME': timedelta(days=365 * 100),  # 100 years
     'REFRESH_TOKEN_LIFETIME': timedelta(days=365 * 100),
 }
 
-STATIC_ROOT = os.path.join(BASE_DIR, 'static')
+# STATIC_ROOT = os.path.join(BASE_DIR, 'static')
 # STATICFILES_DIRS = [os.path.join(BASE_DIR, 'static')]
 
 MEDIA_URL='media/'
 MEDIA_ROOT=os.path.join(BASE_DIR,'media')
-# CLOUD_NAME="drlcmhrcg"
-# CLOUDINARY_API_KEY="997498217494732"
-# CLOUDINARY_API_SECRET="kNxzzNDDqvi2ppSHIpbWIU58_wA"
-# CLOUDINARY_STORAGE = {
-#     'CLOUD_NAME': CLOUD_NAME,
-#     'API_KEY': CLOUDINARY_API_KEY,
-#     'API_SECRET': CLOUDINARY_API_SECRET,
-# }
 
+# MEDIA_ROOT=os.path.join(BASE_DIR,'media')
+CLOUD_NAME="drlcmhrcg"
+CLOUDINARY_API_KEY="997498217494732"
+CLOUDINARY_API_SECRET="kNxzzNDDqvi2ppSHIpbWIU58_wA"
+CLOUDINARY_STORAGE = {
+    'CLOUD_NAME': CLOUD_NAME,
+    'API_KEY': CLOUDINARY_API_KEY,
+    'API_SECRET': CLOUDINARY_API_SECRET,
+}
+STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
+
+DEFAULT_FILE_STORAGE = 'cloudinary_storage.storage.MediaCloudinaryStorage'
+# Default primary key field type
+# https://docs.djangoproject.com/en/5.1/ref/settings/#default-auto-field
+
+DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+FILE_UPLOAD_MAX_MEMORY_SIZE = 100 * 1024 * 1024 * 1024 # (30MEGABYTES)
+DATA_UPLOAD_MAX_MEMORY_SIZE = FILE_UPLOAD_MAX_MEMORY_SIZE
 
 # Configure email settings (ensure this is done before sending emails)
 # Alternatively, use EMAIL_USE_TLS if required
@@ -193,7 +203,7 @@ MEDIA_ROOT=os.path.join(BASE_DIR,'media')
 
  # or EMAIL_USE_TLS = True
 
-DEFAULT_FILE_STORAGE = 'cloudinary_storage.storage.MediaCloudinaryStorage'
+
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.1/ref/settings/#default-auto-field
 

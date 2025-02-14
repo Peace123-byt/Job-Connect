@@ -1,5 +1,6 @@
 from rest_framework.permissions import AllowAny
 from rest_framework import viewsets
+from rest_framework.parsers import MultiPartParser, FormParser
 
 from core_root_api.security.user.serializers.user import UserSerializer
 from core_root_api.security.user.models import User
@@ -8,6 +9,7 @@ class UserViewset(viewsets.ModelViewSet):
     http_method_names=['patch','get']
     permission_classes=[AllowAny,]
     serializer_class=UserSerializer
+    parser_classes = [MultiPartParser,FormParser]
 
     def get_queryset(self):
         if self.request.user.is_superuser:

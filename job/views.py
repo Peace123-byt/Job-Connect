@@ -160,11 +160,16 @@ def student_login(request):
     
     return render(request, "auth/student_login.html")
 def logout(request):
-    
-    current_user=User.objects.get(email=str(request.session.get("email")))
-    current_user.is_logged_in=False
-    current_user.save()
-    return redirect('studentlogin')
+    try:
+        current_user=User.objects.get(email=str(request.session.get("email")))
+        current_user.is_logged_in=False
+        request.session['user_id']=None
+        request.session['email']=None
+        current_user.save()
+        return redirect('studentlogin')
+    except Exception as e:
+        return redirect('studentlogin')
+
 def student_signup(request):
     if request.method=='POST':
     #      "id": "8fd354acae80425db147021537b75a01",
@@ -286,7 +291,21 @@ def reset_password(request):
     return render(request, "auth/reset_password.html")
 
 def change_password(request):
-    return render(request, "auth/change_password.html")
+    try:
+        if request.method=='POST':
+            password=request.POST['password']
+            confirm_password=request.POST['confirm_password']
+
+            if password==confirm_password:
+                current_user=User.objects.get(public_id=str(request.session.get("user_id")))
+                print(current_user.full_name)
+            # print(password+confirm_password)
+        return render(request, "auth/change_password.html")
+
+    except Exception as e:
+        return redirect("studentlogin")
+
+
 
 def company_profile(request):
     return render(request, "job/company_profile.html")
@@ -294,10 +313,14 @@ def company_profile(request):
 def student_profile(request):
     try:
         user_id=request.session.get('user_id')
+
+        if user_id==None:
+            return redirect("studentlogin") 
+
         response=requests.get(f"{api_url.base_url}/user/{user_id}")
         print(response.json())
     except Exception as e:
-        pass
+        return redirect("studentlogin") 
     return render(request, "job/student_profile.html",response.json())
 
 def admin_profile(request):
